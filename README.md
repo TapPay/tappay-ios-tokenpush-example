@@ -4,8 +4,8 @@ TapPay Push Token Example Code for iOS Plateform.
 
 - <font size=1> [Flow](#flow) </font>
 - <font size=1> [Prepare](#prepare) </font>
-- <font size=1> [Usage](#usage-objc) </font>
-- <font size=1> [Usage](#usage-swift) </font>
+- <font size=1> [Usage - Objective C](#usage-objc) </font>
+- <font size=1> [Usage - Swift](#usage-swift) </font>
 
 <a name="flow"></a>
 # Flow
