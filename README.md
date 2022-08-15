@@ -2,6 +2,9 @@
 
 TapPay Push Token Example Code for iOS Plateform.
 
+# Flow
+![](./TSP_Shop_Bind_Card_Flow.png)
+
 # Prepare
 
 Get push token from the website which provide by mastercard
