@@ -4,7 +4,8 @@ TapPay Push Token Example Code for iOS Plateform.
 
 - <font size=1> [Flow](#flow) </font>
 - <font size=1> [Prepare](#prepare) </font>
-- <font size=1> [Usage](#usage) </font>
+- <font size=1> [Usage](#usage-objc) </font>
+- <font size=1> [Usage](#usage-swift) </font>
 
 <a name="flow"></a>
 # Flow
@@ -18,12 +19,12 @@ Get push token from the website which provide by mastercard
 (Please contact TapPay for TRID and access code)
 > https://tokenconnect.mcsrcteststore.com/dashboard
 
-<a name="usage"></a>
 # Usage
 
 ### If the setup and usage of issuer bank app has already finished
 
-### Objective c
+<a name="usage-objc"></a>
+### Objective C
 ### 1. Get push token in AppDelegate or SceneDelegate
 ```objc
 // AppDelegate
@@ -75,6 +76,7 @@ Get push token from the website which provide by mastercard
 }
 ```
 
+<a name="usage-swift"></a>
 ### Swift
 
 ### 1. Get push token in AppDelegate or SceneDelegate
