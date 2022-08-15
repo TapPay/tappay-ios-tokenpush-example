@@ -10,6 +10,7 @@ Get push token from the website which provide by mastercard
 # Usage
 
 ### If the setup and usage of issuer bank app has already finished
+### Objective c
 ### 1. Get push token in AppDelegate or SceneDelegate
 ```objc
 // AppDelegate
@@ -60,3 +61,5 @@ Get push token from the website which provide by mastercard
     
 }
 ```
+
+### Swift
