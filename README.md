@@ -5,6 +5,8 @@ TapPay Push Token Example Code for iOS Plateform.
 # Flow
 ![](./TSP_Shop_Bind_Card_Flow.png)
 
+[Objective c](#objc)
+
 # Prepare
 
 Get push token from the website which provide by mastercard
@@ -13,6 +15,7 @@ Get push token from the website which provide by mastercard
 # Usage
 
 ### If the setup and usage of issuer bank app has already finished
+<a name="objc"></a>
 ### Objective c
 ### 1. Get push token in AppDelegate or SceneDelegate
 ```objc
