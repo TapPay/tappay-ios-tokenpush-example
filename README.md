@@ -15,7 +15,7 @@ TapPay Push Token Example Code for iOS Plateform.
 # Prepare
 
 Get push token from the website which provide by mastercard
-(Please conteact TapPay for TRID)
+(Please conteact TapPay for TRID and access code)
 > https://tokenconnect.mcsrcteststore.com/dashboard
 
 <a name="usage"></a>
