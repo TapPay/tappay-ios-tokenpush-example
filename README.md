@@ -69,10 +69,60 @@ Get push token from the website which provide by mastercard
 }
 
 - (void)pushTokenizeWithToken:(NSString *)token
-              successCallback:(void (^ _Nullable)(PushTokenizeObject *result))successCallback
-              failureCallback:(void (^ _Nullable)(NSInteger status, NSString * message))failureCallback{
+              successCallback:(void (^)(NSDictionary *result))successCallback
+              failureCallback:(void (^)(NSInteger status, NSString * message))failureCallback{
     
 }
 ```
 
 ### Swift
+
+### 1. Get push token in AppDelegate or SceneDelegate
+```swift
+// AppDelegate
+func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    // Parsing the url by any method which could return parameters
+    let parseResult = Global.queryParameter(url: url)
+    let pushToken = parseResult["tspPushToken"]
+    // Post the push token to observer
+    NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: pushToken, userInfo: nil)
+    return true
+}
+```
+```swift
+// SceneDelegate
+func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+    if let url = URLContexts.first?.url {
+        // Parsing the url by any method which could return parameters
+        let parseResult = Global.queryParameter(url: url)
+        let pushToken = parseResult["tspPushToken"]
+        // Post the push token to observer
+        NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: pushToken, userInfo: nil)
+    }
+}
+```
+
+### 2. Register observer to get push token and post push tokenize request
+
+```swift
+override func viewDidLoad() {
+    super.viewDidLoad()
+    // Do any additional setup after loading the view.
+    NotificationCenter.default.addObserver(self, selector: #selector(tokenGet(notification:)), name: NSNotification.Name.init("TSP_Push_Token"), object: nil)
+}
+
+@objc func tokenGet(notification : NSNotification) {
+    let pushToken = notification.object as! String
+    if pushToken.count > 0 {
+        pushTokenizeWithToken(token: pushToken) { result in
+            // Do something here if request succeed
+        } fail: {
+            // Do something here if request failed
+        }
+    }
+}
+
+private func pushTokenizeWithToken(token: String ,success: @escaping (_ result: Dictionary<String, Any>) -> Void ,fail: @escaping () -> Void) {
+    
+}
+```
