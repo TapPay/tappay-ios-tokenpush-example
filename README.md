@@ -45,9 +45,8 @@ Get push token from the website which provide by mastercard
 
 - (void)tokenGet:(NSNotification *)notification {
     NSString *pushToken = [notification object];
-    _token = pushToken;
     if (pushToken.length > 0) {
-        [self pushTokenizeWithToken:_token successCallback:^(PushTokenizeObject *result) {
+        [self pushTokenizeWithToken:pushToken successCallback:^(PushTokenizeObject *result) {
             // Do something here if request succeed
         } failureCallback:^(NSInteger status, NSString *message) {
             // Do something here if request failed
