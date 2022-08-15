@@ -1,4 +1,4 @@
-# tappay-ios-tokenpush-example
+# Tappay-iOS-Tokenpush-Example
 
 TapPay Push Token Example Code for iOS Plateform.
 
@@ -31,5 +31,33 @@ Get push token from the website which provide by mastercard
     NSString *pushToken = [parseResult objectForKey:@"tspPushToken"];
     // Post the push token to observer
     [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:pushToken];
+}
+```
+
+### 2. Register observer to get push token and post push tokenize request
+
+```objc
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenGet:) name:@"TSP_Push_Token" object:nil];
+}
+
+- (void)tokenGet:(NSNotification *)notification {
+    NSString *pushToken = [notification object];
+    _token = pushToken;
+    if (pushToken.length > 0) {
+        [self pushTokenizeWithToken:_token successCallback:^(PushTokenizeObject *result) {
+            // Do something here if request succeed
+        } failureCallback:^(NSInteger status, NSString *message) {
+            // Do something here if request failed
+        }];
+    }
+}
+
+- (void)pushTokenizeWithToken:(NSString *)token
+              successCallback:(void (^ _Nullable)(PushTokenizeObject *result))successCallback
+              failureCallback:(void (^ _Nullable)(NSInteger status, NSString * message))failureCallback{
+    
 }
 ```
