@@ -21,7 +21,7 @@ TapPay Push Token Example Code for iOS Plateform.
 2. Contact TapPay to create merchant with the app URL scheme and download link
 
 3. Setup the URL scheme in the Info.plist of example project
-![](./URL setup.png)
+![](./URL_setup.png)
 
 
 # Usage
