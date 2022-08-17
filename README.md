@@ -15,9 +15,14 @@ TapPay Push Token Example Code for iOS Plateform.
 <a name="prepare"></a>
 # Prepare
 
-Get push token from the website which provide by mastercard
-(Please contact TapPay for TRID and access code)
-> https://tokenconnect.mcsrcteststore.com/dashboard
+1. Contact TapPay for getting TRID and access code used on MDES Token Connect platform
+> MDES Token Connect : https://tokenconnect.mcsrcteststore.com/dashboard
+
+2. Contact TapPay to create merchant with the app URL scheme and download link
+
+3. Setup the URL scheme in the Info.plist of example project
+![](./URL setup.png)
+
 
 # Usage
 
