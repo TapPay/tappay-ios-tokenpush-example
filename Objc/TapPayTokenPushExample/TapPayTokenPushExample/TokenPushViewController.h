@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) IBOutlet UILabel *cardNumberLabel;
 @property (strong, nonatomic) NSString *token;
+@property (strong, nonatomic) NSString *cancelUrl;
 
 @end
 

@@ -93,7 +93,7 @@ typedef NS_ENUM(NSInteger, BindStatus) {
             break;
     }
     
-    if (_token.length <= 0) {
+    if ([[self.resultDict objectForKey:@"callback_url"] length] <= 0 && _cancelUrl.length <= 0) {
         [_backToBankBtn setHidden:true];
         _btnGoShoppingTrailingLC.constant = (CGRectGetWidth(self.view.bounds) - CGRectGetWidth(_backToBankBtn.frame))/2;
     }else {
@@ -106,7 +106,7 @@ typedef NS_ENUM(NSInteger, BindStatus) {
 
 - (IBAction)backToBankPressed:(id)sender {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSURL *url = [NSURL URLWithString:[self.resultDict objectForKey:@"callback_url"]];
+        NSURL *url = (self.bindStatus == BindStatusCancel) ? [NSURL URLWithString:self.cancelUrl] : [NSURL URLWithString:[self.resultDict objectForKey:@"callback_url"]];
         [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
     });
 }
@@ -150,7 +150,7 @@ typedef NS_ENUM(NSInteger, BindStatus) {
 
         NSDictionary *JsonObject = (data != nil) ?[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil] : nil;
         NSLog(@"%@", JsonObject);
-        if ([[JsonObject objectForKey:@"status"] integerValue] == 0) {
+        if ([[JsonObject objectForKey:@"status"] integerValue] == 0 || [[JsonObject objectForKey:@"status"] integerValue] == 19004) {
             if (successCallback) {
                 successCallback(JsonObject);
             }
@@ -168,6 +168,8 @@ typedef NS_ENUM(NSInteger, BindStatus) {
 - (void)didFinishReadingTerms:(TermsViewController *)controller {
     [self setIndicatorHidden:false];
     [self pushTokenizeWithToken:_token successCallback:^(NSDictionary *result) {
+        self.token = @"";
+        self.bindStatus = BindStatusSuccess;
         self.resultDict = [NSDictionary dictionary];
         self.resultDict = result;
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -175,6 +177,8 @@ typedef NS_ENUM(NSInteger, BindStatus) {
             [self configResultUIWithStatus:BindStatusSuccess];
         });
     } failureCallback:^(NSInteger status, NSString *message) {
+        self.token = @"";
+        self.bindStatus = BindStatusFail;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self setIndicatorHidden:true];
             [self configResultUIWithStatus:BindStatusFail];
@@ -187,6 +191,7 @@ typedef NS_ENUM(NSInteger, BindStatus) {
 }
 
 - (void)didCancelReadingTerms:(TermsViewController *)controller {
+    _bindStatus = BindStatusCancel;
     [self configResultUIWithStatus:BindStatusCancel];
 }
 

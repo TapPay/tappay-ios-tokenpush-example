@@ -19,10 +19,9 @@
     // Override point for customization after application launch.
     NSURL *url = launchOptions[UIApplicationLaunchOptionsURLKey];
     if (url) {
-        NSDictionary *parseResult = [GlobalFunction queryParameter:url];
-        NSString *pushToken = [parseResult objectForKey:@"tspPushToken"];
+        NSArray *queryItems = [GlobalFunction queryParameter:url];
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:pushToken];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
         });
     }
     return YES;
@@ -30,16 +29,14 @@
 
 - (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {
     NSURL * url = userActivity.webpageURL;
-    NSDictionary *parseResult = [GlobalFunction queryParameter:url];
-    NSString *pushToken = [parseResult objectForKey:@"tspPushToken"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:pushToken];
+    NSArray *queryItems = [GlobalFunction queryParameter:url];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
     return true;
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-    NSDictionary *parseResult = [GlobalFunction queryParameter:url];
-    NSString *pushToken = [parseResult objectForKey:@"tspPushToken"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:pushToken];
+    NSArray *queryItems = [GlobalFunction queryParameter:url];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
     return true;
 }
 

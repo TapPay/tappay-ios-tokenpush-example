@@ -17,10 +17,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         if let url = connectionOptions.urlContexts.first?.url as? URL {
-            let parseResult = Global.queryParameter(url: url)
-            let pushToken = parseResult["tspPushToken"]
+            let queryItems = URLComponents(string: url.absoluteString)?.queryItems
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: pushToken, userInfo: nil)
+                NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: queryItems, userInfo: nil)
             }
         }
         guard let _ = (scene as? UIWindowScene) else { return }
@@ -56,9 +55,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         if let url = URLContexts.first?.url {
-            let parseResult = Global.queryParameter(url: url)
-            let pushToken = parseResult["tspPushToken"]
-            NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: pushToken, userInfo: nil)
+            let queryItems = URLComponents(string: url.absoluteString)?.queryItems
+            NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: queryItems, userInfo: nil)
         }
     }
 }

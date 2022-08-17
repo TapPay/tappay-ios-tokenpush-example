@@ -23,10 +23,9 @@
     
     NSURL * url = [[[[connectionOptions URLContexts] allObjects] firstObject] URL];
     if (url) {
-        NSDictionary *parseResult = [GlobalFunction queryParameter:url];
-        NSString *pushToken = [parseResult objectForKey:@"tspPushToken"];
+        NSArray *queryItems = [GlobalFunction queryParameter:url];
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:pushToken];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
         });
     }
 }
@@ -65,9 +64,8 @@
 
 - (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts {
     NSURL * url = [[[URLContexts allObjects] firstObject] URL];
-    NSDictionary *parseResult = [GlobalFunction queryParameter:url];
-    NSString *pushToken = [parseResult objectForKey:@"tspPushToken"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:pushToken];
+    NSArray *queryItems = [GlobalFunction queryParameter:url];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
 }
 
 

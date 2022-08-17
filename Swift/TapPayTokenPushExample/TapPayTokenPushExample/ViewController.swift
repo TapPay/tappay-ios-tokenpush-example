@@ -15,6 +15,7 @@ class ViewController: BaseViewController {
     @IBOutlet weak var accountTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var loginBtn: UIButton!
+    var queryItems : Array<URLQueryItem> = Array.init()
     var token : String = ""
     
     override func viewDidLoad() {
@@ -30,9 +31,9 @@ class ViewController: BaseViewController {
 
     @objc func tokenGet(notification : NSNotification) {
         
-        let pushToken = notification.object as! String
-        token = pushToken
-        if pushToken.count > 0 {
+        queryItems = notification.object as! Array<URLQueryItem>
+        token = queryItems.filter({$0.name == "tspPushToken"}).first?.value ?? ""
+        if token.count > 0 {
             DispatchQueue.main.async {
                 self.setIndicatorHidden(hidden: true)
                 Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
@@ -82,6 +83,7 @@ class ViewController: BaseViewController {
         if segue.identifier == "LoginToTokenPush" {
             if let controller = segue.destination as? TokenPushViewController {
                 controller.token = token
+                controller.cancelUrl = queryItems.filter({$0.name == "cancelUrl"}).first?.value ?? ""
             }
         }
     }

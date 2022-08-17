@@ -28,6 +28,7 @@ class TokenPushViewController : BaseViewController{
     private var bindStatus: BindStatus?
     private var resultDict : Dictionary<String, Any>?
     var token : String = ""
+    var cancelUrl : String = ""
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -64,7 +65,8 @@ class TokenPushViewController : BaseViewController{
             break
         }
         
-        if token.count <= 0 {
+        let callbackUrl = resultDict!["callback_url"] as? String ?? ""
+        if callbackUrl.count <= 0 && cancelUrl.count <= 0 {
             backToBankBtn.isHidden = true
             btnGoShoppingTrailingLC.constant = (self.view.bounds.width - backToBankBtn.frame.width)/2
         }else {
@@ -75,7 +77,7 @@ class TokenPushViewController : BaseViewController{
     
     @IBAction func backToBankPressed(_ sender: Any) {
         DispatchQueue.main.async {
-            let url = URL.init(string: self.resultDict!["callback_url"] as! String)!
+            let url = (self.bindStatus == .cancel) ? URL.init(string: self.cancelUrl)! : URL.init(string: self.resultDict!["callback_url"] as! String)!
             UIApplication.shared.open(url)
         }
     }
@@ -113,12 +115,16 @@ extension TokenPushViewController: TermsViewControllerDelegate {
     func didFinishReadingTerms(controller: TermsViewController) {
         setIndicatorHidden(hidden: false)
         pushTokenizeWithToken(token: token) { result in
+            self.token = ""
+            self.bindStatus = .success
             self.resultDict = result
             DispatchQueue.main.async {
                 self.setIndicatorHidden(hidden: true)
                 self.configResultUIWithStatus(status: .success)
             }
         } fail: {
+            self.token = ""
+            self.bindStatus = .fail
             DispatchQueue.main.async {
                 self.setIndicatorHidden(hidden: true)
                 self.configResultUIWithStatus(status: .fail)
@@ -127,6 +133,8 @@ extension TokenPushViewController: TermsViewControllerDelegate {
     }
     
     func didCancelReadingTerms(controller: TermsViewController) {
+        self.token = ""
+        self.bindStatus = .cancel
         configResultUIWithStatus(status: .cancel)
     }
 }

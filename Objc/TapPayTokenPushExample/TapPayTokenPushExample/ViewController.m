@@ -7,6 +7,7 @@
 
 #import "ViewController.h"
 #import "TokenPushViewController.h"
+#import "GlobalFunction.h"
 
 #define ACCOUNT @"Test"
 #define PASSWORD @"Test"
@@ -16,7 +17,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *accountTextField;
 @property (weak, nonatomic) IBOutlet UITextField *passwordTextField;
 @property (weak, nonatomic) IBOutlet UIButton *loginBtn;
-@property (strong, nonatomic) NSString *token;
+@property (strong, nonatomic) NSArray *queryItems;
 
 @end
 
@@ -37,9 +38,9 @@
 }
 
 - (void)tokenGet:(NSNotification *)notification {
-    NSString *pushToken = [notification object];
-    _token = pushToken;
-    if (pushToken.length > 0) {
+    NSArray *queryItems = [notification object];
+    _queryItems = queryItems;
+    if ([[GlobalFunction valueForKey:@"tspPushToken" fromQueryItems:_queryItems] length] > 0) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self setIndicatorHidden:true];
             [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:false block:^(NSTimer * _Nonnull timer) {
@@ -99,7 +100,8 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"LoginToTokenPush"]) {
         TokenPushViewController *controller = segue.destinationViewController;
-        controller.token = _token;
+        controller.token = [GlobalFunction valueForKey:@"tspPushToken" fromQueryItems:_queryItems];
+        controller.cancelUrl = [GlobalFunction valueForKey:@"cancelUrl" fromQueryItems:_queryItems];
     }
 }
 

@@ -9,24 +9,20 @@
 
 @implementation GlobalFunction
 
-+ (NSMutableDictionary *)queryParameter:(NSURL *)url {
++ (NSArray *)queryParameter:(NSURL *)url {
+    NSArray *items = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO].queryItems;
+    return items;
     
-    NSMutableDictionary *queryStrings = [[NSMutableDictionary alloc] init];
-    
-    for (NSString *qs in [url.query componentsSeparatedByString:@"&"]) {
-        // Get the parameter name
-        NSString *key = [[qs componentsSeparatedByString:@"="] objectAtIndex:0];
-        // Get the parameter value
-        NSString *value = [[qs componentsSeparatedByString:@"="] objectAtIndex:1];
-        value = [value stringByReplacingOccurrencesOfString:@"+" withString:@" "];
-        value = [value stringByRemovingPercentEncoding];
-        
-        queryStrings[key] = value;
-        
-    }
-    
-    return queryStrings;
-    
+}
+
++ (NSString *)valueForKey:(NSString *)key
+           fromQueryItems:(NSArray *)queryItems
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name=%@", key];
+    NSURLQueryItem *queryItem = [[queryItems
+                                  filteredArrayUsingPredicate:predicate]
+                                 firstObject];
+    return queryItem.value;
 }
 
 @end

@@ -15,10 +15,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         if let url = launchOptions?[UIApplication.LaunchOptionsKey.url] as? URL {
-            let parseResult = Global.queryParameter(url: url)
-            let pushToken = parseResult["tspPushToken"]
+            let queryItems = URLComponents(string: url.absoluteString)?.queryItems
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: pushToken, userInfo: nil)
+                NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: queryItems, userInfo: nil)
             }
         }
         return true
@@ -39,9 +38,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        let parseResult = Global.queryParameter(url: url)
-        let pushToken = parseResult["tspPushToken"]
-        NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: pushToken, userInfo: nil)
+        let queryItems = URLComponents(string: url.absoluteString)?.queryItems
+        NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: queryItems, userInfo: nil)
         return true
     }
 }

@@ -11,7 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface GlobalFunction : NSObject
 
-+ (NSMutableDictionary *)queryParameter:(NSURL *)url;
++ (NSArray *)queryParameter:(NSURL *)url;
++ (NSString *)valueForKey:(NSString *)key fromQueryItems:(NSArray *)queryItems;
 
 @end
 
