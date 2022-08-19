@@ -26,6 +26,7 @@ class ViewController: BaseViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
         setIndicatorHidden(hidden: true)
     }
 
@@ -82,7 +83,7 @@ class ViewController: BaseViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "LoginToTokenPush" {
             if let controller = segue.destination as? TokenPushViewController {
-                controller.token = token
+                controller.pushToken = token
                 controller.cancelUrl = queryItems.filter({$0.name == "cancelUrl"}).first?.value ?? ""
             }
         }

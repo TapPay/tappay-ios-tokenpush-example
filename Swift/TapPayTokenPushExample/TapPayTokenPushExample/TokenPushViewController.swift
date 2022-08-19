@@ -27,12 +27,13 @@ class TokenPushViewController : BaseViewController{
     @IBOutlet weak var backToBankBtn: UIButton!
     private var bindStatus: BindStatus?
     private var resultDict : Dictionary<String, Any>?
-    var token : String = ""
+    var pushToken : String = ""
     var cancelUrl : String = ""
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if token.count > 0 {
+        NotificationCenter.default.addObserver(self, selector: #selector(tokenGet(notification:)), name: NSNotification.Name.init("TSP_Push_Token"), object: nil)
+        if pushToken.count > 0 {
             let termsViewController = self.storyboard?.instantiateViewController(withIdentifier: "TermsViewController") as! TermsViewController
             termsViewController.delegate = self
             termsViewController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
@@ -41,6 +42,22 @@ class TokenPushViewController : BaseViewController{
             }
         }else {
             configResultUIWithStatus(status: .cancel)
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc func tokenGet(notification : NSNotification) {
+        if pushToken.count <= 0 {
+            let queryItems = notification.object as! Array<URLQueryItem>
+            let token = queryItems.filter({$0.name == "tspPushToken"}).first?.value ?? ""
+            if token.count > 0 {
+                pushToken = token
+                doPushTokenize()
+            }
         }
     }
     
@@ -55,7 +72,7 @@ class TokenPushViewController : BaseViewController{
             statusImageView.image = UIImage.init(named: "failed")
             resultLabel.text = "Add Card Fail"
             cardNumberLabel.isHidden = true
-            cardNumberLabel.text = ""
+            cardNumberLabel.text = "\(resultDict ?? Dictionary.init())"
         case .cancel:
             statusImageView.image = UIImage.init(named: "success")
             resultLabel.text = "Cancel Success"
@@ -82,7 +99,7 @@ class TokenPushViewController : BaseViewController{
         }
     }
     
-    private func pushTokenizeWithToken(token: String ,success: @escaping (_ result: Dictionary<String, Any>) -> Void ,fail: @escaping () -> Void) {
+    private func pushTokenizeWithToken(token: String ,success: @escaping (_ result: Dictionary<String, Any>) -> Void ,fail: @escaping (_ result:Dictionary<String, Any>?, _ error:Error?) -> Void) {
         
         let url = URL.init(string: PUSH_TOKENIZE_PATH)!
         var request = URLRequest.init(url: url)
@@ -101,39 +118,51 @@ class TokenPushViewController : BaseViewController{
                     let json = try JSONSerialization.jsonObject(with: data)
                     let dic = json as! Dictionary<String,Any>
                     print(dic)
-                    success(dic)
+                    
+                    let status = dic["status"] as! Int
+                    if status == 0 || status == 19004 {
+                        success(dic)
+                    }else {
+                        fail(dic, nil)
+                    }
                 } catch  {
                     print(error)
+                    fail(nil, error)
                 }
             }
         }.resume()
     }
-}
-
-extension TokenPushViewController: TermsViewControllerDelegate {
     
-    func didFinishReadingTerms(controller: TermsViewController) {
+    private func doPushTokenize() {
         setIndicatorHidden(hidden: false)
-        pushTokenizeWithToken(token: token) { result in
-            self.token = ""
+        pushTokenizeWithToken(token: pushToken) { result in
+            self.pushToken = ""
             self.bindStatus = .success
             self.resultDict = result
             DispatchQueue.main.async {
                 self.setIndicatorHidden(hidden: true)
                 self.configResultUIWithStatus(status: .success)
             }
-        } fail: {
-            self.token = ""
+        } fail: {result,error in
+            self.pushToken = ""
             self.bindStatus = .fail
+            self.resultDict = result
             DispatchQueue.main.async {
                 self.setIndicatorHidden(hidden: true)
                 self.configResultUIWithStatus(status: .fail)
             }
         }
     }
+}
+
+extension TokenPushViewController: TermsViewControllerDelegate {
+    
+    func didFinishReadingTerms(controller: TermsViewController) {
+        doPushTokenize()
+    }
     
     func didCancelReadingTerms(controller: TermsViewController) {
-        self.token = ""
+        self.pushToken = ""
         self.bindStatus = .cancel
         configResultUIWithStatus(status: .cancel)
     }

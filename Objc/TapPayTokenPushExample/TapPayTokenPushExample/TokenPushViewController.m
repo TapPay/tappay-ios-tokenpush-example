@@ -41,6 +41,7 @@ typedef NS_ENUM(NSInteger, BindStatus) {
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenGet:) name:@"TSP_Push_Token" object:nil];
     if (_token.length > 0) {
         TermsViewController *termsViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TermsViewController"];
         termsViewController.delegate = self;
@@ -53,6 +54,11 @@ typedef NS_ENUM(NSInteger, BindStatus) {
     }
 }
 
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     // For test (will be removed before release)
@@ -62,6 +68,16 @@ typedef NS_ENUM(NSInteger, BindStatus) {
 }
 
 #pragma mark - Private Method
+
+- (void)tokenGet:(NSNotification *)notification {
+    if (_token.length <= 0) {
+        NSArray *queryItems = [notification object];
+        if ([[GlobalFunction valueForKey:@"tspPushToken" fromQueryItems:queryItems] length] > 0) {
+            _token = [GlobalFunction valueForKey:@"tspPushToken" fromQueryItems:queryItems];
+            [self doPushTokenize];
+        }
+    }
+}
 
 - (void)configResultUIWithStatus:(BindStatus)status {
     switch (status) {
@@ -102,6 +118,29 @@ typedef NS_ENUM(NSInteger, BindStatus) {
     }
 }
 
+- (void)doPushTokenize {
+    [self setIndicatorHidden:false];
+    [self pushTokenizeWithToken:_token successCallback:^(NSDictionary *result) {
+        self.token = @"";
+        self.bindStatus = BindStatusSuccess;
+        self.resultDict = result;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self setIndicatorHidden:true];
+            [self configResultUIWithStatus:BindStatusSuccess];
+        });
+    } failureCallback:^(NSDictionary *result, NSError *error) {
+        self.token = @"";
+        self.bindStatus = BindStatusFail;
+        if (result) {
+            self.resultDict = result;
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self setIndicatorHidden:true];
+            [self configResultUIWithStatus:BindStatusFail];
+        });
+    }];
+}
+
 #pragma mark - IBAction
 
 - (IBAction)backToBankPressed:(id)sender {
@@ -129,7 +168,7 @@ typedef NS_ENUM(NSInteger, BindStatus) {
 
 - (void)pushTokenizeWithToken:(NSString *)token
               successCallback:(void (^)(NSDictionary *result))successCallback
-              failureCallback:(void (^)(NSInteger status, NSString * message))failureCallback{
+              failureCallback:(void (^)(NSDictionary *result,  NSError *error))failureCallback{
     
     NSURL *url = [NSURL URLWithString:PUSH_TOKENIZE_PATH];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
@@ -150,44 +189,29 @@ typedef NS_ENUM(NSInteger, BindStatus) {
 
         NSDictionary *JsonObject = (data != nil) ?[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil] : nil;
         NSLog(@"%@", JsonObject);
-        if ([[JsonObject objectForKey:@"status"] integerValue] == 0 || [[JsonObject objectForKey:@"status"] integerValue] == 19004) {
-            if (successCallback) {
-                successCallback(JsonObject);
+        
+        if (error) {
+            if (failureCallback) {
+                failureCallback(nil, error);
             }
         }else {
-            if (failureCallback) {
-                failureCallback([[JsonObject objectForKey:@"status"] integerValue], [JsonObject objectForKey:@"msg"]);
+            if ([[JsonObject objectForKey:@"status"] integerValue] == 0 || [[JsonObject objectForKey:@"status"] integerValue] == 19004) {
+                if (successCallback) {
+                    successCallback(JsonObject);
+                }
+            }else {
+                if (failureCallback) {
+                    failureCallback(JsonObject, nil);
+                }
             }
         }
-        
     }] resume];
 }
 
 #pragma mark - TermsViewController Delegate
 
 - (void)didFinishReadingTerms:(TermsViewController *)controller {
-    [self setIndicatorHidden:false];
-    [self pushTokenizeWithToken:_token successCallback:^(NSDictionary *result) {
-        self.token = @"";
-        self.bindStatus = BindStatusSuccess;
-        self.resultDict = [NSDictionary dictionary];
-        self.resultDict = result;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self setIndicatorHidden:true];
-            [self configResultUIWithStatus:BindStatusSuccess];
-        });
-    } failureCallback:^(NSInteger status, NSString *message) {
-        self.token = @"";
-        self.bindStatus = BindStatusFail;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self setIndicatorHidden:true];
-            [self configResultUIWithStatus:BindStatusFail];
-            UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Error" message:message preferredStyle:UIAlertControllerStyleAlert];
-            UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
-            [controller addAction:okAction];
-            [self presentViewController:controller animated:false completion:nil];
-        });
-    }];
+    [self doPushTokenize];
 }
 
 - (void)didCancelReadingTerms:(TermsViewController *)controller {
