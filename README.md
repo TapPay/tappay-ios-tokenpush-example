@@ -15,13 +15,14 @@ TapPay Push Token Example Code for iOS Plateform.
 <a name="prepare"></a>
 # Prepare
 
-1. Contact TapPay for getting TRID and access code used on MDES Token Connect platform
-> MDES Token Connect : https://tokenconnect.mcsrcteststore.com/dashboard
-
-2. Contact TapPay to create merchant with the app URL scheme and download link
-
-3. Setup the URL scheme in the Info.plist of example project
+1. Make sure issuer app has been installed
+2. Setup the URL scheme in the Info.plist of example project
 ![](./URL_setup.png)
+3. Issuer App will launch your App with **tspPushToken** and **cancelUrl**
+4. Parse **TspPushToken** and **cancelUrl** from intent data
+5. Send <a href="https://docs.tappaysdk.com/tutorial/zh/advanced.html#push-token-api" target="_blank">Push Token API</a>  to Tappay server
+6. You will get a suceess response with cardKey and cardToken
+7. You may get more card information by <a href="https://docs.tappaysdk.com/tutorial/zh/advanced.html#card-metadata-api" target="_blank">Card Metadata API</a> if you want
 
 
 # Usage
