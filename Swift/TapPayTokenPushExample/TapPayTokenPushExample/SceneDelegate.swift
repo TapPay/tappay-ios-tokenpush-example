@@ -56,7 +56,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         if let url = URLContexts.first?.url {
             let queryItems = URLComponents(string: url.absoluteString)?.queryItems
-            NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: queryItems, userInfo: nil)
+            DispatchQueue.main.async {
+                if let navigationController = self.window?.rootViewController as? UINavigationController {
+                        navigationController.popToRootViewController(animated: true)
+                }
+                NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: queryItems, userInfo: nil)
+            }
         }
     }
 }

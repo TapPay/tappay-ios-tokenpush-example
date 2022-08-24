@@ -26,7 +26,7 @@ class ViewController: BaseViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        NotificationCenter.default.removeObserver(self)
+        token = ""
         setIndicatorHidden(hidden: true)
     }
 
@@ -36,9 +36,9 @@ class ViewController: BaseViewController {
         token = queryItems.filter({$0.name == "tspPushToken"}).first?.value ?? ""
         if token.count > 0 {
             DispatchQueue.main.async {
-                self.setIndicatorHidden(hidden: true)
+                self.setIndicatorHidden(hidden: false)
                 Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { timer in
-                    self.setIndicatorHidden(hidden: false)
+                    self.setIndicatorHidden(hidden: true)
                     self.performSegue(withIdentifier: "LoginToTokenPush", sender: nil)
                 }
             }

@@ -9,8 +9,8 @@ import Foundation
 import UIKit
 
 private let DEFAULT_TRAILING = 59.0
-private let PUSH_TOKENIZE_PATH = "https://prod-main.dev.tappaysdk.com/tpc/tsp/token/push-tokenize"
-private let PUSH_TOKENIZE_ACCESS_KEY = "72DMgo9RQN2BSW4SmaHWYVOUCEIUDMg9i1JnXKic"
+private let PUSH_TOKENIZE_PATH = "https://sandbox.tappaysdk.com/tpc/tsp/token/push-tokenize"
+private let PUSH_TOKENIZE_ACCESS_KEY = "axgLG8z7vVa8mgIzdU1233rjBFAEmTti19NZd1pI"
 
 enum BindStatus {
     case success
@@ -22,9 +22,9 @@ class TokenPushViewController : BaseViewController{
     
     @IBOutlet weak var statusImageView: UIImageView!
     @IBOutlet weak var resultLabel: UILabel!
-    @IBOutlet weak var cardNumberLabel: UILabel!
     @IBOutlet weak var btnGoShoppingTrailingLC: NSLayoutConstraint!
     @IBOutlet weak var backToBankBtn: UIButton!
+    @IBOutlet weak var responseTextView: UITextView!
     private var bindStatus: BindStatus?
     private var resultDict : Dictionary<String, Any>?
     var pushToken : String = ""
@@ -32,7 +32,6 @@ class TokenPushViewController : BaseViewController{
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        NotificationCenter.default.addObserver(self, selector: #selector(tokenGet(notification:)), name: NSNotification.Name.init("TSP_Push_Token"), object: nil)
         if pushToken.count > 0 {
             let termsViewController = self.storyboard?.instantiateViewController(withIdentifier: "TermsViewController") as! TermsViewController
             termsViewController.delegate = self
@@ -47,18 +46,6 @@ class TokenPushViewController : BaseViewController{
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    @objc func tokenGet(notification : NSNotification) {
-        if pushToken.count <= 0 {
-            let queryItems = notification.object as! Array<URLQueryItem>
-            let token = queryItems.filter({$0.name == "tspPushToken"}).first?.value ?? ""
-            if token.count > 0 {
-                pushToken = token
-                doPushTokenize()
-            }
-        }
     }
     
     private func configResultUIWithStatus(status: BindStatus) {
@@ -66,29 +53,31 @@ class TokenPushViewController : BaseViewController{
         case .success:
             statusImageView.image = UIImage.init(named: "success")
             resultLabel.text = "Add Card Success"
-            cardNumberLabel.isHidden = false
-            cardNumberLabel.text = "\(resultDict ?? Dictionary.init())"
+            responseTextView.isHidden = false
+            responseTextView.text = "\(resultDict ?? Dictionary.init())"
         case .fail:
             statusImageView.image = UIImage.init(named: "failed")
             resultLabel.text = "Add Card Fail"
-            cardNumberLabel.isHidden = true
-            cardNumberLabel.text = "\(resultDict ?? Dictionary.init())"
+            responseTextView.isHidden = true
+            responseTextView.text = "\(resultDict ?? Dictionary.init())"
         case .cancel:
             statusImageView.image = UIImage.init(named: "success")
             resultLabel.text = "Cancel Success"
-            cardNumberLabel.isHidden = true
-            cardNumberLabel.text = ""
+            responseTextView.isHidden = true
+            responseTextView.text = ""
         default:
             break
         }
         
-        let callbackUrl = resultDict!["callback_url"] as? String ?? ""
-        if callbackUrl.count <= 0 && cancelUrl.count <= 0 {
-            backToBankBtn.isHidden = true
-            btnGoShoppingTrailingLC.constant = (self.view.bounds.width - backToBankBtn.frame.width)/2
-        }else {
-            backToBankBtn.isHidden = false
-            btnGoShoppingTrailingLC.constant = DEFAULT_TRAILING
+        if (resultDict != nil) {
+            let callbackUrl = resultDict!["callback_url"] as? String ?? ""
+            if callbackUrl.count <= 0 && cancelUrl.count <= 0 {
+                backToBankBtn.isHidden = true
+                btnGoShoppingTrailingLC.constant = (self.view.bounds.width - backToBankBtn.frame.width)/2
+            }else {
+                backToBankBtn.isHidden = false
+                btnGoShoppingTrailingLC.constant = DEFAULT_TRAILING
+            }
         }
     }
     
@@ -100,7 +89,7 @@ class TokenPushViewController : BaseViewController{
     }
     
     private func pushTokenizeWithToken(token: String ,success: @escaping (_ result: Dictionary<String, Any>) -> Void ,fail: @escaping (_ result:Dictionary<String, Any>?, _ error:Error?) -> Void) {
-        
+        let identifier =  UIApplication.shared.beginBackgroundTask(withName: "Push_Token") as UIBackgroundTaskIdentifier
         let url = URL.init(string: PUSH_TOKENIZE_PATH)!
         var request = URLRequest.init(url: url)
         request.httpMethod = "POST"
@@ -113,6 +102,7 @@ class TokenPushViewController : BaseViewController{
         request.httpBody = data
         
         URLSession.shared.dataTask(with: request) { data, response, error in
+            UIApplication.shared.endBackgroundTask(identifier)
             if let data = data {
                 do {
                     let json = try JSONSerialization.jsonObject(with: data)

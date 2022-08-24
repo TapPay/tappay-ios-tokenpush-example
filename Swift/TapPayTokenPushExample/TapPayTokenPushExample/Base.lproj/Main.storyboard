@@ -314,30 +314,31 @@ Subject to the terms and conditions of the Agreement, [Merchant Name] grants to 
                                     <action selector="goShoppingPressed:" destination="2ZJ-gg-jhU" eventType="touchUpInside" id="x6A-wL-ir3"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="XXXX-XXXX-XXXX-XXXX" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aLc-o4-u57">
-                                <rect key="frame" x="20" y="257.5" width="280" height="16"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lxw-lo-1iq">
+                                <rect key="frame" x="20" y="257.5" width="280" height="300.5"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="280" id="kr1-1P-JwT"/>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" id="oyy-il-9F5"/>
+                                    <constraint firstAttribute="width" constant="280" id="8LE-Mu-LrP"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="4wE-7s-fHD"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="aLc-o4-u57" firstAttribute="centerX" secondItem="E0m-vR-U8n" secondAttribute="centerX" id="8HT-vE-Ovr"/>
                             <constraint firstItem="KYa-P2-Hed" firstAttribute="centerX" secondItem="E0m-vR-U8n" secondAttribute="centerX" id="EfY-mc-9uf"/>
                             <constraint firstItem="OZA-8E-qoK" firstAttribute="top" secondItem="4wE-7s-fHD" secondAttribute="top" constant="30" id="IGH-3I-ZR0"/>
                             <constraint firstItem="4wE-7s-fHD" firstAttribute="trailing" secondItem="rcb-h2-Wms" secondAttribute="trailing" constant="59" id="ItJ-Se-cRa"/>
                             <constraint firstItem="HTg-L3-8qG" firstAttribute="leading" secondItem="4wE-7s-fHD" secondAttribute="leading" constant="59" id="O94-fu-CpJ"/>
+                            <constraint firstItem="Lxw-lo-1iq" firstAttribute="top" secondItem="HTg-L3-8qG" secondAttribute="bottom" constant="10" id="Qad-J5-b9J"/>
+                            <constraint firstItem="4wE-7s-fHD" firstAttribute="bottom" secondItem="Lxw-lo-1iq" secondAttribute="bottom" constant="10" id="YBg-F8-VhI"/>
                             <constraint firstItem="rcb-h2-Wms" firstAttribute="height" secondItem="HTg-L3-8qG" secondAttribute="height" id="aUH-uP-Adw"/>
                             <constraint firstItem="rcb-h2-Wms" firstAttribute="top" secondItem="HTg-L3-8qG" secondAttribute="top" id="dcF-Ko-3qN"/>
                             <constraint firstItem="HTg-L3-8qG" firstAttribute="top" secondItem="KYa-P2-Hed" secondAttribute="bottom" constant="20" id="fkB-D5-Cxa"/>
+                            <constraint firstItem="Lxw-lo-1iq" firstAttribute="centerX" secondItem="E0m-vR-U8n" secondAttribute="centerX" id="hZB-Et-pPX"/>
                             <constraint firstItem="KYa-P2-Hed" firstAttribute="top" secondItem="OZA-8E-qoK" secondAttribute="bottom" constant="28" id="hrt-0F-bmb"/>
-                            <constraint firstItem="aLc-o4-u57" firstAttribute="top" secondItem="HTg-L3-8qG" secondAttribute="bottom" constant="10" id="i19-YJ-9na"/>
                             <constraint firstItem="rcb-h2-Wms" firstAttribute="width" secondItem="HTg-L3-8qG" secondAttribute="width" id="o1q-Yl-xcQ"/>
                             <constraint firstItem="OZA-8E-qoK" firstAttribute="centerX" secondItem="E0m-vR-U8n" secondAttribute="centerX" id="w6o-dK-Qw1"/>
                         </constraints>
@@ -346,7 +347,7 @@ Subject to the terms and conditions of the Agreement, [Merchant Name] grants to 
                     <connections>
                         <outlet property="backToBankBtn" destination="HTg-L3-8qG" id="Cyb-xE-2Vq"/>
                         <outlet property="btnGoShoppingTrailingLC" destination="ItJ-Se-cRa" id="bXh-AF-huq"/>
-                        <outlet property="cardNumberLabel" destination="aLc-o4-u57" id="zXZ-xy-b41"/>
+                        <outlet property="responseTextView" destination="Lxw-lo-1iq" id="ZQ7-TQ-fzY"/>
                         <outlet property="resultLabel" destination="KYa-P2-Hed" id="9aa-BU-dUJ"/>
                         <outlet property="statusImageView" destination="OZA-8E-qoK" id="cw5-np-G6O"/>
                     </connections>
@@ -375,6 +376,9 @@ Subject to the terms and conditions of the Agreement, [Merchant Name] grants to 
     <resources>
         <image name="square" catalog="system" width="128" height="114"/>
         <image name="success.png" width="512" height="512"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
         <systemColor name="systemBlueColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
