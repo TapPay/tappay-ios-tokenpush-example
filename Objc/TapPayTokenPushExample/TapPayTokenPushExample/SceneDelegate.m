@@ -63,9 +63,18 @@
 }
 
 - (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts {
-    NSURL * url = [[[URLContexts allObjects] firstObject] URL];
-    NSArray *queryItems = [GlobalFunction queryParameter:url];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
+    
+    if (self.window.rootViewController.childViewControllers > 0) {
+        if ([self.window.rootViewController isKindOfClass:[UINavigationController class]]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
+                [navigationController popToRootViewControllerAnimated:false];
+                NSURL * url = [[[URLContexts allObjects] firstObject] URL];
+                NSArray *queryItems = [GlobalFunction queryParameter:url];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
+            });
+        }
+    }
 }
 
 

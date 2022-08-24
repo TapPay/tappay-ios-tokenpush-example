@@ -314,26 +314,27 @@ Subject to the terms and conditions of the Agreement, [Merchant Name] grants to 
                                     <action selector="goShoppingPressed:" destination="wmk-KS-sP0" eventType="touchUpInside" id="LdO-Zr-Rg6"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="XXXX-XXXX-XXXX-XXXX" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vtZ-hQ-VX3">
-                                <rect key="frame" x="20" y="267.5" width="280" height="12"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PyP-LE-WNY">
+                                <rect key="frame" x="20" y="267.5" width="280" height="280.5"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" id="0bo-Vo-mll"/>
-                                    <constraint firstAttribute="width" constant="280" id="aq7-VH-8IM"/>
+                                    <constraint firstAttribute="width" constant="280" id="y8V-vD-Q2N"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="o1W-os-eb2"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="PyP-LE-WNY" firstAttribute="centerX" secondItem="ZrX-10-cCj" secondAttribute="centerX" id="5kD-Id-5nj"/>
                             <constraint firstItem="YYk-Fi-hcq" firstAttribute="top" secondItem="VOV-No-LxZ" secondAttribute="top" id="89S-iQ-UTE"/>
-                            <constraint firstItem="vtZ-hQ-VX3" firstAttribute="centerX" secondItem="ZrX-10-cCj" secondAttribute="centerX" id="ADm-Zb-wol"/>
                             <constraint firstItem="xTi-P0-Sxh" firstAttribute="centerX" secondItem="ZrX-10-cCj" secondAttribute="centerX" id="CkT-65-8Vx"/>
                             <constraint firstItem="VOV-No-LxZ" firstAttribute="leading" secondItem="o1W-os-eb2" secondAttribute="leading" constant="59" id="D7r-mZ-8dp"/>
                             <constraint firstItem="LeY-1w-nqQ" firstAttribute="top" secondItem="xTi-P0-Sxh" secondAttribute="bottom" constant="28" id="IOe-jB-Q3h"/>
-                            <constraint firstItem="vtZ-hQ-VX3" firstAttribute="top" secondItem="VOV-No-LxZ" secondAttribute="bottom" constant="20" id="foq-Qf-Ju8"/>
+                            <constraint firstItem="o1W-os-eb2" firstAttribute="bottom" secondItem="PyP-LE-WNY" secondAttribute="bottom" constant="20" id="M8C-9x-rqq"/>
+                            <constraint firstItem="PyP-LE-WNY" firstAttribute="top" secondItem="VOV-No-LxZ" secondAttribute="bottom" constant="20" id="gI5-k0-XkH"/>
                             <constraint firstItem="VOV-No-LxZ" firstAttribute="top" secondItem="LeY-1w-nqQ" secondAttribute="bottom" constant="20" id="hHH-RJ-2mt"/>
                             <constraint firstItem="LeY-1w-nqQ" firstAttribute="centerX" secondItem="ZrX-10-cCj" secondAttribute="centerX" id="imY-tG-fJT"/>
                             <constraint firstItem="YYk-Fi-hcq" firstAttribute="width" secondItem="VOV-No-LxZ" secondAttribute="width" id="nu0-h1-5yC"/>
@@ -346,7 +347,7 @@ Subject to the terms and conditions of the Agreement, [Merchant Name] grants to 
                     <connections>
                         <outlet property="backToBankBtn" destination="VOV-No-LxZ" id="LKV-JX-ere"/>
                         <outlet property="btnGoShoppingTrailingLC" destination="vN3-oa-yUY" id="PCV-iw-id6"/>
-                        <outlet property="cardNumberLabel" destination="vtZ-hQ-VX3" id="zIl-Bs-QtC"/>
+                        <outlet property="responseTextView" destination="PyP-LE-WNY" id="8Aj-N2-gsf"/>
                         <outlet property="resultLabel" destination="LeY-1w-nqQ" id="dqp-bv-le7"/>
                         <outlet property="statusImageView" destination="xTi-P0-Sxh" id="dUZ-vT-mPh"/>
                     </connections>
@@ -375,6 +376,9 @@ Subject to the terms and conditions of the Agreement, [Merchant Name] grants to 
     <resources>
         <image name="square" catalog="system" width="128" height="114"/>
         <image name="success.png" width="512" height="512"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
         <systemColor name="systemBlueColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

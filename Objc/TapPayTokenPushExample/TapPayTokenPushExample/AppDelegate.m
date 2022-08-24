@@ -28,15 +28,31 @@
 }
 
 - (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {
-    NSURL * url = userActivity.webpageURL;
-    NSArray *queryItems = [GlobalFunction queryParameter:url];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
+    if (self.window.rootViewController.childViewControllers > 0) {
+        if ([self.window.rootViewController isKindOfClass:[UINavigationController class]]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
+                [navigationController popToRootViewControllerAnimated:false];
+                NSURL * url = userActivity.webpageURL;
+                NSArray *queryItems = [GlobalFunction queryParameter:url];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
+            });
+        }
+    }
     return true;
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-    NSArray *queryItems = [GlobalFunction queryParameter:url];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
+    if (self.window.rootViewController.childViewControllers > 0) {
+        if ([self.window.rootViewController isKindOfClass:[UINavigationController class]]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
+                [navigationController popToRootViewControllerAnimated:false];
+                NSArray *queryItems = [GlobalFunction queryParameter:url];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
+            });
+        }
+    }
     return true;
 }
 

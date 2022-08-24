@@ -30,12 +30,17 @@
     // Do any additional setup after loading the view.
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(endEdit:)];
     [self.view addGestureRecognizer:tapGesture];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenGet:) name:@"TSP_Push_Token" object:nil];
 }
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setIndicatorHidden:true];
+    });
+}
+
+#pragma mark - Private Method
 
 - (void)endEdit:(UITapGestureRecognizer *)recognizer {
     [self.view endEditing:true];
@@ -46,24 +51,14 @@
     _queryItems = queryItems;
     if ([[GlobalFunction valueForKey:@"tspPushToken" fromQueryItems:_queryItems] length] > 0) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self setIndicatorHidden:true];
+            [self setIndicatorHidden:false];
             [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:false block:^(NSTimer * _Nonnull timer) {
-                [self setIndicatorHidden:false];
+                [self setIndicatorHidden:true];
                 [self performSegueWithIdentifier:@"LoginToTokenPush" sender:nil];
             }];
         });
     }
 }
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self setIndicatorHidden:true];
-    });
-}
-
-#pragma mark - Private Method
 
 - (BOOL)isLoginValid {
     if (_accountTextField.text.length <= 0 ||

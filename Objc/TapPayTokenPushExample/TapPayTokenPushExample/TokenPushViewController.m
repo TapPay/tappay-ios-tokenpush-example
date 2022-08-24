@@ -10,8 +10,8 @@
 #import "GlobalFunction.h"
 
 #define DEFAULT_TRAILING 59.0
-#define PUSH_TOKENIZE_PATH @"https://prod-main.dev.tappaysdk.com/tpc/tsp/token/push-tokenize"
-#define PUSH_TOKENIZE_ACCESS_KEY @"72DMgo9RQN2BSW4SmaHWYVOUCEIUDMg9i1JnXKic"
+#define PUSH_TOKENIZE_PATH @"https://sandbox.tappaysdk.com/tpc/tsp/token/push-tokenize"
+#define PARTNER_KEY @"axgLG8z7vVa8mgIzdU1233rjBFAEmTti19NZd1pI"
 
 typedef NS_ENUM(NSInteger, BindStatus) {
     BindStatusSuccess,
@@ -23,10 +23,12 @@ typedef NS_ENUM(NSInteger, BindStatus) {
 
 @property (weak, nonatomic) IBOutlet UIImageView *statusImageView;
 @property (weak, nonatomic) IBOutlet UILabel *resultLabel;
-@property (assign, nonatomic) BindStatus bindStatus;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *btnGoShoppingTrailingLC;
 @property (weak, nonatomic) IBOutlet UIButton *backToBankBtn;
+@property (weak, nonatomic) IBOutlet UITextView *responseTextView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *btnGoShoppingTrailingLC;
+@property (strong, nonatomic) TermsViewController *termsViewController;
 @property (strong, nonatomic) NSDictionary *resultDict;
+@property (assign, nonatomic) BindStatus bindStatus;
 
 @end
 
@@ -41,43 +43,21 @@ typedef NS_ENUM(NSInteger, BindStatus) {
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenGet:) name:@"TSP_Push_Token" object:nil];
     if (_token.length > 0) {
-        TermsViewController *termsViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TermsViewController"];
-        termsViewController.delegate = self;
-        termsViewController.modalPresentationStyle = UIModalPresentationFullScreen;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self presentViewController:termsViewController animated:false completion:nil];
-        });
+        if (_termsViewController == nil) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.termsViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TermsViewController"];
+                self.termsViewController.delegate = self;
+                self.termsViewController.modalPresentationStyle = UIModalPresentationFullScreen;
+                [self presentViewController:self.termsViewController animated:false completion:nil];
+            });
+        }
     }else {
         [self configResultUIWithStatus:BindStatusCancel];
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    // For test (will be removed before release)
-    if (_token.length > 0) {
-//        [self notifyToken];
-    }
-}
-
 #pragma mark - Private Method
-
-- (void)tokenGet:(NSNotification *)notification {
-    if (_token.length <= 0) {
-        NSArray *queryItems = [notification object];
-        if ([[GlobalFunction valueForKey:@"tspPushToken" fromQueryItems:queryItems] length] > 0) {
-            _token = [GlobalFunction valueForKey:@"tspPushToken" fromQueryItems:queryItems];
-            [self doPushTokenize];
-        }
-    }
-}
 
 - (void)configResultUIWithStatus:(BindStatus)status {
     switch (status) {
@@ -85,24 +65,24 @@ typedef NS_ENUM(NSInteger, BindStatus) {
         {
             [_statusImageView setImage:[UIImage imageNamed:@"success"]];
             [_resultLabel setText:@"Add Card Success"];
-            [_cardNumberLabel setHidden:false];
-            [_cardNumberLabel setText:[NSString stringWithFormat:@"%@", _resultDict]];
+            [_responseTextView setHidden:false];
+            [_responseTextView setText:[NSString stringWithFormat:@"%@", _resultDict]];
         }
             break;
         case BindStatusFail:
         {
             [_statusImageView setImage:[UIImage imageNamed:@"failed"]];
             [_resultLabel setText:@"Add Card Fail"];
-            [_cardNumberLabel setHidden:false];
-            [_cardNumberLabel setText:[NSString stringWithFormat:@"%@", _resultDict]];
+            [_responseTextView setHidden:false];
+            [_responseTextView setText:[NSString stringWithFormat:@"%@", _resultDict]];
         }
             break;
         case BindStatusCancel:
         {
             [_statusImageView setImage:[UIImage imageNamed:@"success"]];
             [_resultLabel setText:@"Cancel Success"];
-            [_cardNumberLabel setHidden:true];
-            [_cardNumberLabel setText:@""];
+            [_responseTextView setHidden:true];
+            [_responseTextView setText:@""];
         }
             break;
         default:
@@ -152,20 +132,6 @@ typedef NS_ENUM(NSInteger, BindStatus) {
 
 #pragma mark - Push Tokenize API
 
-// For test (will be removed before release)
-- (void)notifyToken {
-    NSURL *url = [NSURL URLWithString:@"https://pushtoken.requestcatcher.com/test"];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    [request setHTTPMethod:@"POST"];
-    NSDictionary *parametersDict = @{@"tsp_push_token":_token};
-    NSData *parameterData =[NSJSONSerialization dataWithJSONObject:parametersDict options:NSJSONWritingPrettyPrinted error:NULL];
-    [request setHTTPBody:parameterData];
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
-    [[session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
-    }] resume];
-}
-
 - (void)pushTokenizeWithToken:(NSString *)token
               successCallback:(void (^)(NSDictionary *result))successCallback
               failureCallback:(void (^)(NSDictionary *result,  NSError *error))failureCallback{
@@ -175,10 +141,10 @@ typedef NS_ENUM(NSInteger, BindStatus) {
     [request setHTTPMethod:@"POST"];
     [request setTimeoutInterval:10.0];
     [request addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    [request addValue:PUSH_TOKENIZE_ACCESS_KEY forHTTPHeaderField:@"x-api-key"];
+    [request addValue:PARTNER_KEY forHTTPHeaderField:@"x-api-key"];
     [request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
     
-    NSDictionary *parametersDict = @{@"partner_key":PUSH_TOKENIZE_ACCESS_KEY,
+    NSDictionary *parametersDict = @{@"partner_key":PARTNER_KEY,
                                      @"tsp_push_token":token};
     NSData *parameterData =[NSJSONSerialization dataWithJSONObject:parametersDict options:NSJSONWritingPrettyPrinted error:NULL];
     [request setHTTPBody:parameterData];

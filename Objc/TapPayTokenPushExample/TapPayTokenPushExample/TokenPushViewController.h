@@ -12,7 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TokenPushViewController : BaseViewController
 
-@property (weak, nonatomic) IBOutlet UILabel *cardNumberLabel;
 @property (strong, nonatomic) NSString *token;
 @property (strong, nonatomic) NSString *cancelUrl;
 
