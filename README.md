@@ -134,5 +134,11 @@ override func viewDidLoad() {
 
 private func pushTokenizeWithToken(token: String ,success: @escaping (_ result: Dictionary<String, Any>) -> Void ,fail: @escaping (_ result:Dictionary<String, Any>, _ error:Error) -> Void) {
     
+    ...
+    
+    let parametersDict = ["partner_key":yourPartnerKey,"tsp_push_token":token]
+    
+    ...
+    
 }
 ```
