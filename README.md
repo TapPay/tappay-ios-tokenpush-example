@@ -15,9 +15,15 @@ TapPay Push Token Example Code for iOS Plateform.
 <a name="prepare"></a>
 # Prepare
 
-Get push token from the website which provide by mastercard
-(Please contact TapPay for TRID and access code)
-> https://tokenconnect.mcsrcteststore.com/dashboard
+1. Make sure issuer app has been installed
+2. Setup the URL scheme in the Info.plist of example project
+![](./URL_setup.png)
+3. Issuer App will launch your App with **tspPushToken** and **cancelUrl**
+4. Parse **TspPushToken** and **cancelUrl** from intent data
+5. Send <a href="https://docs.tappaysdk.com/tutorial/zh/advanced.html#push-token-api" target="_blank">Push Token API</a>  to Tappay server
+6. You will get a suceess response with cardKey and cardToken
+7. You may get more card information by <a href="https://docs.tappaysdk.com/tutorial/zh/advanced.html#card-metadata-api" target="_blank">Card Metadata API</a> if you want
+
 
 # Usage
 
@@ -30,10 +36,9 @@ Get push token from the website which provide by mastercard
 // AppDelegate
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
     // Parsing the url by any method which could return parameters
-    NSDictionary *parseResult = [GlobalFunction queryParameter:url];
-    NSString *pushToken = [parseResult objectForKey:@"tspPushToken"];
-    // Post the push token to observer
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:pushToken];
+    NSArray *queryItems = [GlobalFunction queryParameter:url];
+    // Post the push token and cancel url to observer
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
     return true;
 }
 ```
@@ -42,10 +47,10 @@ Get push token from the website which provide by mastercard
 - (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts {
     NSURL * url = [[[URLContexts allObjects] firstObject] URL];
     // Parsing the url by any method which could return parameters
-    NSDictionary *parseResult = [GlobalFunction queryParameter:url];
-    NSString *pushToken = [parseResult objectForKey:@"tspPushToken"];
-    // Post the push token to observer
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:pushToken];
+    NSURL * url = [[[URLContexts allObjects] firstObject] URL];
+    NSArray *queryItems = [GlobalFunction queryParameter:url];
+    // Post the push token and cancel url to observer
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"TSP_Push_Token" object:queryItems];
 }
 ```
 
@@ -61,9 +66,9 @@ Get push token from the website which provide by mastercard
 - (void)tokenGet:(NSNotification *)notification {
     NSString *pushToken = [notification object];
     if (pushToken.length > 0) {
-        [self pushTokenizeWithToken:pushToken successCallback:^(PushTokenizeObject *result) {
+        [self pushTokenizeWithToken:pushToken successCallback:^(NSDictionary *result) {
             // Do something here if request succeed
-        } failureCallback:^(NSInteger status, NSString *message) {
+        } failureCallback:^(NSDictionary *result,  NSError *error) {
             // Do something here if request failed
         }];
     }
@@ -71,8 +76,13 @@ Get push token from the website which provide by mastercard
 
 - (void)pushTokenizeWithToken:(NSString *)token
               successCallback:(void (^)(NSDictionary *result))successCallback
-              failureCallback:(void (^)(NSInteger status, NSString * message))failureCallback{
+              failureCallback:(void (^)(NSDictionary *result,  NSError *error))failureCallback{
+    ...
     
+    NSDictionary *parametersDict = @{@"partner_key":yourPartnerKey,
+                                     @"tsp_push_token":token};
+                                        
+    ...
 }
 ```
 
@@ -84,10 +94,9 @@ Get push token from the website which provide by mastercard
 // AppDelegate
 func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
     // Parsing the url by any method which could return parameters
-    let parseResult = Global.queryParameter(url: url)
-    let pushToken = parseResult["tspPushToken"]
-    // Post the push token to observer
-    NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: pushToken, userInfo: nil)
+    let queryItems = URLComponents(string: url.absoluteString)?.queryItems
+    // Post the push token and cancel url to observer
+    NotificationCenter.default.post(name:NSNotification.Name.init("TSP_Push_Token"), object: queryItems, userInfo: nil)
     return true
 }
 ```
@@ -96,10 +105,9 @@ func application(_ app: UIApplication, open url: URL, options: [UIApplication.Op
 func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     if let url = URLContexts.first?.url {
         // Parsing the url by any method which could return parameters
-        let parseResult = Global.queryParameter(url: url)
-        let pushToken = parseResult["tspPushToken"]
-        // Post the push token to observer
-        NotificationCenter.default.post(name: NSNotification.Name.init("TSP_Push_Token"), object: pushToken, userInfo: nil)
+        let queryItems = URLComponents(string: url.absoluteString)?.queryItems
+        // Post the push token and cancel url to observer
+        NotificationCenter.default.post(name:NSNotification.Name.init("TSP_Push_Token"), object: queryItems, userInfo: nil)
     }
 }
 ```
@@ -118,13 +126,19 @@ override func viewDidLoad() {
     if pushToken.count > 0 {
         pushTokenizeWithToken(token: pushToken) { result in
             // Do something here if request succeed
-        } fail: {
+        } fail: { result,error in
             // Do something here if request failed
         }
     }
 }
 
-private func pushTokenizeWithToken(token: String ,success: @escaping (_ result: Dictionary<String, Any>) -> Void ,fail: @escaping () -> Void) {
+private func pushTokenizeWithToken(token: String ,success: @escaping (_ result: Dictionary<String, Any>) -> Void ,fail: @escaping (_ result:Dictionary<String, Any>, _ error:Error) -> Void) {
+    
+    ...
+    
+    let parametersDict = ["partner_key":yourPartnerKey,"tsp_push_token":token]
+    
+    ...
     
 }
 ```
